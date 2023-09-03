@@ -31,8 +31,6 @@ func (s semVar) String() string {
 	return "v" + strconv.Itoa(s.major) + "." + strconv.Itoa(s.minor)
 }
 
-const PB_URL = "https://github.com/protocolbuffers/protobuf/releases"
-
 // TODO: make cleanup func to remove zip file and the rest
 
 // installCmd represents the new command
@@ -99,16 +97,27 @@ func protocInstall() {
 		"Would you like to install protoc? (y/n)",
 	}
 	installProtoc := promptGetProtocInput(protocPrompt)
-	if installProtoc {
-		versionPrompt := promptContent{
-			"You do understand semantic versioning, don't you?",
-			"What version would you like installed? (semantic versioning pls)",
-		}
-		sm = promptGetProtocVersion(versionPrompt)
-
+	if !installProtoc {
+		return
+	}
+	versionPrompt := promptContent{
+		"You do understand semantic versioning, don't you?",
+		"What version would you like installed? (semantic versioning pls)",
 	}
 
-	protocInstaller(installProtoc, sm)
+	sm = promptGetProtocVersion(versionPrompt)
+
+	installPathPrompt := promptContent{
+		"",
+		"Where would you like to install the protoc compiler? (Default is . )",
+	}
+	installPath := promptGetInstallPath(installPathPrompt)
+
+	protocInstaller(installProtoc, sm, installPath)
+}
+
+func promptGetInstallPath(prompt promptContent) string {
+	return "."
 }
 
 func promptGetProtocVersion(pc promptContent) semVar {
@@ -165,7 +174,7 @@ func promptGetProtocVersion(pc promptContent) semVar {
 	return sm
 }
 
-func protocInstaller(installProtoc bool, sm semVar) {
+func protocInstaller(installProtoc bool, sm semVar, installPath string) {
 	if !installProtoc {
 		return
 	}
@@ -191,7 +200,7 @@ func protocInstaller(installProtoc bool, sm semVar) {
 	}
 
 	// Create the file
-	out, err := os.Create("test.zip")
+	out, err := os.CreateTemp("", "protoc.zip")
 	if err != nil {
 		fmt.Printf("err: %s", err)
 	}
