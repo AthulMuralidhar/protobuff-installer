@@ -1,6 +1,9 @@
 package cmd
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 type semVar struct {
 	major int
@@ -10,9 +13,9 @@ type semVar struct {
 
 func (s semVar) String() string {
 	//return "v" + strconv.Itoa(s.major) + "." + strconv.Itoa(s.minor) + "." + strconv.Itoa(s.patch)
-	return "v" + strconv.Itoa(s.major) + "." + strconv.Itoa(s.minor)
+	return strconv.Itoa(s.major) + "." + strconv.Itoa(s.minor)
 }
 
 func (s semVar) toProtocURL() string {
-		url := "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip"
+		return fmt.Sprintf("https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-linux-x86_64.zip", s.String(), s.String())
 }
