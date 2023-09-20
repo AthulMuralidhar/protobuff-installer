@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+
+	"go.uber.org/zap"
 )
 
 // TODO: make cleanup func to remove zip file and the rest
@@ -37,7 +39,7 @@ func protocInstall() {
 	sm := promptGetProtocVersion(versionPrompt)
 	installPath := promptGetInstallPath(installPathPrompt)
 
-	if err := protocInstaller( sm, installPath); err != nil {
+	if err := protocInstaller(sm, installPath); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -49,38 +51,47 @@ func protocInstaller(sm semVar, installPath string) error {
 	// TODO: fix url making, the below works, but the hand made one does not
 	// FIXME
 	//url := fmt.Sprintf("%s/download/%s/protoc-%s-linux-x86_64.zip", PB_URL, sm.String(), sm.String())
+
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+
 	url := "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip"
 
-	fmt.Printf("url: %s\n", url)
+	sugar.Debugf("url: %s\n", url)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("err: %s", err)
+		return fmt.Errorf("err during http.Get: %s", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("status", resp.Status)
+
+	sugar.Debugf("response status: %s", resp.Status)
+
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
 	}
 
 	// Create the file
-	out, err := os.CreateTemp("", "protoc.zip")
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("err during getcwd call: %s", err)
+	}
+
+	f, err := os.CreateTemp(cwd, "protoc.zip")
 	if err != nil {
 		return fmt.Errorf("error during creating temp zip file: %w", err)
 	}
-	defer out.Close()
+	defer os.Remove(f.Name())
 
 	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(f, resp.Body)
 	if err != nil {
 		return fmt.Errorf("error during writing to temp zip file: %w", err)
 	}
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("error during getting user home dir: %w", err)
-	}
+
 	// basically this:  unzip protoc-3.15.8-linux-x86_64.zip -d $HOME/.local
-	err = unzip("test.zip", homeDir+"/.protoc")
+	err = unzip(f.Name(), cwd)
 	if err != nil {
 		return fmt.Errorf("error during unzipping: %w", err)
 	}
@@ -91,7 +102,7 @@ func protocInstaller(sm semVar, installPath string) error {
 	// fmt.Println("finally copy paste this into your terminal:")
 	// fmt.Println(`export PATH="$PATH:$HOME/.protoc/bin"`)
 
-	log.Println("protocInstall: done")
+	sugar.Info("protocInstall: done")
 	return nil
 }
 
