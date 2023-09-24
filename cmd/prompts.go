@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/AthulMuralidhar/protobuff-installer/cmd/semvar"
 	"os"
 	"strconv"
 	"strings"
@@ -34,7 +35,7 @@ func promptGetInstallPath(prompt promptContent) string {
 	return "."
 }
 
-func promptGetProtocVersion(pc promptContent) semVar {
+func promptGetProtocVersion(pc promptContent) semvar.SemVar {
 	validate := func(input string) error {
 		if len(input) <= 0 {
 			return errors.New(pc.errorMsg)
@@ -78,10 +79,10 @@ func promptGetProtocVersion(pc promptContent) semVar {
 	}
 
 	semVarList := strings.Split(result, ".")
-	var sm semVar
+	var sm semvar.SemVar
 
-	sm.major, err = strconv.Atoi(semVarList[0])
-	sm.minor, err = strconv.Atoi(semVarList[1])
+	sm.Major, err = strconv.Atoi(semVarList[0])
+	sm.Minor, err = strconv.Atoi(semVarList[1])
 	// FIXME
 	//sm.patch, err = strconv.Atoi(semVarList[2])
 
