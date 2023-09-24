@@ -52,3 +52,5 @@ go.work
 /.idea/sonarlint/securityhotspotstore/c/7/c7f2c3f1b5788ed64cbce047d6dd01bc2a4b4a19
 /.idea/sonarlint/securityhotspotstore/e/a/ea7294d283e3c01f17cfd96a28769ce1bad8cbff
 /.idea/sonarlint/securityhotspotstore/index.pb
+
+/protoc
