@@ -1,6 +1,7 @@
-package downloader_test
+package downloader
 
 import (
+	"go.uber.org/zap"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -14,43 +15,31 @@ func TestDownloader(t *testing.T) {
 
 var _ = Describe("Downloader", func() {
 
-})
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
 
-//
-//import (
-//"go.uber.org/zap"
-//"os"
-//"reflect"
-//"testing"
-//)
-//
-//func Test_downloadAndCreateFile(t *testing.T) {
-//	type args struct {
-//		sugar *zap.SugaredLogger
-//		url   string
-//		cwd   string
-//	}
-//	tests := []struct {
-//		name    string
-//		args    args
-//		want    *os.File
-//		wantErr bool
-//	}{
-//		// TODO: check for a protoc.zip to be created in the cwd
-//		// TODO: check for a non 200 return with a fake url
-//		// TODO: check if the file is not empty
-//		// TODO: check perms on the file - it should be accessible to everybody
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			got, err := DownloadAndCreateFile(tt.args.sugar, tt.args.url, tt.args.cwd)
-//			if (err != nil) != tt.wantErr {
-//				t.Errorf("downloadAndCreateFile() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("downloadAndCreateFile() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
+	It("check for a protoc.zip to be created in the cwd", func() {
+		got, err := DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
+
+		Expect(err).To(BeNil())
+		Expect(got).ToNot(BeNil())
+	})
+
+	It("check for a non 200 return with a fake url", func() {
+		got, err := DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/proases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
+
+		Expect(err).ToNot(BeNil())
+		Expect(got).To(BeNil())
+	})
+
+	//		// TODO: check perms on the file - it should be accessible to everybody
+	//		// TODO: check if the file is really a zip
+	It("check perms on the file - it should be accessible to everybody", func() {
+		got, err := DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/proases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
+
+		Expect(err).ToNot(BeNil())
+		Expect(got).To(BeNil())
+	})
+
+})
