@@ -1,7 +1,7 @@
 package unzip
 
 import (
-	"github.com/AthulMuralidhar/protobuff-installer/cmd/downloader"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/downloader"
 	"go.uber.org/zap"
 	"os"
 	"testing"

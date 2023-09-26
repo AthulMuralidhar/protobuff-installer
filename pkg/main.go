@@ -5,7 +5,9 @@ based off of: https://github.com/divrhino/studybuddy/blob/master/cmd/new.go
 */
 package main
 
-import "github.com/AthulMuralidhar/protobuff-installer/cmd"
+import (
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd"
+)
 
 func main() {
 	cmd.Execute()

@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/AthulMuralidhar/protobuff-installer/cmd/semvar"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/semvar"
 	"os"
 	"strconv"
 	"strings"

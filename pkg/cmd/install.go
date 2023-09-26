@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/AthulMuralidhar/protobuff-installer/cmd/downloader"
-	"github.com/AthulMuralidhar/protobuff-installer/cmd/semvar"
-	"github.com/AthulMuralidhar/protobuff-installer/cmd/unzip"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/downloader"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/semvar"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/unzip"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"log"
