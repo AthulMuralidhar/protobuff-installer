@@ -1,6 +1,9 @@
-package unzip_test
+package unzip
 
 import (
+	"github.com/AthulMuralidhar/protobuff-installer/cmd/downloader"
+	"go.uber.org/zap"
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -12,37 +15,25 @@ func TestUnzip(t *testing.T) {
 	RunSpecs(t, "Unzip Suite")
 }
 
-//func Test_unzipToDir(t *testing.T) {
-//	g := gomega.NewWithT(t)
-//	type args struct {
-//		source string
-//		dest   string
-//	}
-//	tests := []struct {
-//		name    string
-//		args    args
-//		wantErr bool
-//	}{
-//		// TODO: make sure that the unzipping happens in the protoc dir
-//		{
-//			name:    "happy flow",
-//			args:    args{
-//				source: "",
-//				dest:   "",
-//			},
-//			wantErr: false,
-//		},
-//	}
-//
-//	err := globalSetup()
-//	g.Expect(err).ToNot(g.)
-//
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			if err := UnzipToDir(tt.args.source, tt.args.dest); (err != nil) != tt.wantErr {
-//				t.Errorf("unzipToDir() error = %v, wantErr %v", err, tt.wantErr)
-//			}
-//		})
-//	}
-//}
+var _ = Describe("Unzip", func() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+
+	f, err := downloader.DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
+	Expect(err).ToNot(HaveOccurred())
+	Expect(f).ToNot(BeNil())
+
+	AfterAll(func() {
+		err := os.Remove(f.Name())
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("make sure that the unziped file is not empty", func() {
+		//		// TODO: make sure that the unziped file is not empty
+
+	})
+
+	//		// TODO: make sure that the unzipping happens in the protoc dir
+	//		// TODO: make sure that the unziped file is not empty
+})
