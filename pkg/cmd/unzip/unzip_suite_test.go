@@ -20,17 +20,24 @@ var _ = Describe("Unzip", func() {
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
 
-	f, err := downloader.DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
-	Expect(err).ToNot(HaveOccurred())
-	Expect(f).ToNot(BeNil())
+	var f *os.File
+	var err error
+
+	BeforeAll(func() {
+		f, err = downloader.DownloadAndCreateFile(sugar, "https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip", "")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(f).ToNot(BeNil())
+	})
 
 	AfterAll(func() {
+		// TODO: this is not working, dunno y
 		err := os.Remove(f.Name())
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("make sure that the unziped file is not empty", func() {
 		//		// TODO: make sure that the unziped file is not empty
+		//		// TODO: make sure that the namr of the file is protoc
 
 	})
 

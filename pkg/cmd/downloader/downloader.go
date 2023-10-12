@@ -32,5 +32,14 @@ func DownloadAndCreateFile(sugar *zap.SugaredLogger, url string, cwd string) (*o
 		return nil, fmt.Errorf("error during writing to temp zip file: %w", err)
 	}
 
+	// check if zip file is empty
+	fileInfo, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("error during getting file info: %w", err)
+	}
+
+	if fileInfo.Size() == 0 {
+		return nil, fmt.Errorf("zip file is empty")
+	}
 	return f, nil
 }
