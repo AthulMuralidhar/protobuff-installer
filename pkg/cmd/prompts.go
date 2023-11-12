@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/semvar"
+	"go.uber.org/zap"
 	"os"
 	"strconv"
 	"strings"
@@ -35,34 +35,11 @@ func promptGetInstallPath(prompt promptContent) string {
 	return "."
 }
 
-func promptGetProtocVersion(pc promptContent) semvar.SemVar {
+func promptGetProtocVersion(logger *zap.SugaredLogger, pc promptContent) semvar.SemVar {
 	validate := func(input string) error {
 		if len(input) <= 0 {
 			return errors.New(pc.errorMsg)
 		}
-		semVarList := strings.Split(input, ".")
-
-		fmt.Printf("semvarlist: %v", semVarList)
-
-		// FIXME
-		//if len(semVarList) != 3 {
-		//	return errors.New(pc.errorMsg)
-		// FIXME
-		//}
-		//_, err := strconv.Atoi(semVarList[0])
-		//if err != nil {
-		//	return err
-		// FIXME
-		//}
-		//_, err = strconv.Atoi(semVarList[1])
-		//if err != nil {
-		//	return err
-		// FIXME
-		//}
-		//_, err = strconv.Atoi(semVarList[2])
-		//if err != nil {
-		//	return err
-		//}
 		return nil
 	}
 
@@ -74,7 +51,7 @@ func promptGetProtocVersion(pc promptContent) semvar.SemVar {
 
 	result, err := prompt.Run()
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
+		logger.Error("Prompt failed:", zap.Error(err))
 		os.Exit(1)
 	}
 
@@ -83,13 +60,11 @@ func promptGetProtocVersion(pc promptContent) semvar.SemVar {
 
 	sm.Major, err = strconv.Atoi(semVarList[0])
 	sm.Minor, err = strconv.Atoi(semVarList[1])
-	// FIXME
-	//sm.patch, err = strconv.Atoi(semVarList[2])
 
 	return sm
 }
 
-func promptGetProtocInput(pc promptContent) bool {
+func promptGetProtocInput(logger *zap.SugaredLogger, pc promptContent) bool {
 	validate := func(input string) error {
 		if len(input) <= 0 {
 			return errors.New(pc.errorMsg)
@@ -113,7 +88,7 @@ func promptGetProtocInput(pc promptContent) bool {
 
 	result, err := prompt.Run()
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
+		logger.Error("Prompt failed:", zap.Error(err))
 		os.Exit(1)
 	}
 

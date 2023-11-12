@@ -2,15 +2,17 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/semvar"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"os"
 )
 
-func DownloadAndCreateFile(sugar *zap.SugaredLogger, url string, cwd string) (*os.File, error) {
-	//Create the file
-	f, err := os.CreateTemp(cwd, "protoc.zip")
+func DownloadAndCreateFile(sugar *zap.SugaredLogger, sm semvar.SemVar, url string, cwd string) (*os.File, error) {
+	sm = checkIfValid(sugar, sm)
+
+	f, err := os.CreateTemp(cwd, "protoc"+sm.String()+".zip")
 	if err != nil {
 		return nil, fmt.Errorf("error during creating temp zip file: %w", err)
 	}
@@ -42,4 +44,23 @@ func DownloadAndCreateFile(sugar *zap.SugaredLogger, url string, cwd string) (*o
 		return nil, fmt.Errorf("zip file is empty")
 	}
 	return f, nil
+}
+
+func checkIfValid(sugar *zap.SugaredLogger, sm semvar.SemVar) semvar.SemVar {
+	// check if the current sem var exists on releases
+	// if the given one is higher than the latest release, revert to latest release sem var and return
+	resp, err := http.Get("https://github.com/protocolbuffers/protobuf/releases")
+	if err != nil {
+		sugar.Error(err)
+		return sm
+	}
+	if resp == nil {
+		sugar.Error("reponse from checkIfValid is nil")
+		return sm
+	}
+	if resp.StatusCode != http.StatusOK {
+		sugar.Error("returned response is not 200")
+		return sm
+	}
+	return sm
 }

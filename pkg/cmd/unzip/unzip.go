@@ -2,12 +2,12 @@ package unzip
 
 import (
 	"archive/zip"
-	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"path"
 )
 
-func UnzipToDir(source, dest string) error {
+func ToDir(logger *zap.SugaredLogger, source, dest string) error {
 	read, err := zip.OpenReader(source)
 	if err != nil {
 		return err
@@ -19,7 +19,7 @@ func UnzipToDir(source, dest string) error {
 		}
 		open, err := file.Open()
 		if err != nil {
-			fmt.Println("cannot open file")
+			logger.Error("cannot open file")
 			return err
 		}
 		name := path.Join(dest, file.Name)
@@ -27,12 +27,12 @@ func UnzipToDir(source, dest string) error {
 		create, err := os.Create(name)
 		if err != nil {
 
-			fmt.Println("cannot create file")
+			logger.Error("cannot create file")
 			return err
 		}
 		defer create.Close()
 		create.ReadFrom(open)
 	}
-	fmt.Println("unzipToDir done")
+	logger.Info("unzipToDir done")
 	return nil
 }

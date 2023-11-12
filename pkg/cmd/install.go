@@ -11,7 +11,6 @@ import (
 	"os"
 )
 
-// installCmd represents the new command
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "main command the the install functionality",
@@ -26,27 +25,27 @@ func init() {
 }
 
 func protocInstall() {
-	log.Println("protocInstall called")
-	installProtoc := promptGetProtocInput(protocPrompt)
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+
+	sugar.Info("protocInstall called")
+	installProtoc := promptGetProtocInput(sugar, protocPrompt)
 	if !installProtoc {
 		log.Println("protocInstall: user does not want to install protoc, exiting...")
 		return
 	}
-	sm := promptGetProtocVersion(versionPrompt)
+	sm := promptGetProtocVersion(sugar, versionPrompt)
 	installPath := promptGetInstallPath(installPathPrompt)
 
-	if err := protocInstaller(sm, installPath); err != nil {
+	if err := protocInstaller(sugar, sm, installPath); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func protocInstaller(sm semvar.SemVar, installPath string) error {
+func protocInstaller(sugar *zap.SugaredLogger, sm semvar.SemVar, installPath string) error {
 	// https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-aarch_64.zip
 	// https://github.com/protocolbuffers/protobuf/releases/download/v24.2/protoc-24.2-linux-x86_64.zip
-
-	logger, _ := zap.NewProduction()
-	defer logger.Sync() // flushes buffer, if any
-	sugar := logger.Sugar()
 
 	url := sm.ToProtocURL()
 
@@ -54,7 +53,7 @@ func protocInstaller(sm semvar.SemVar, installPath string) error {
 	if err != nil {
 		return fmt.Errorf("err during getcwd call: %s", err)
 	}
-	f, err := downloader.DownloadAndCreateFile(sugar, url, cwd)
+	f, err := downloader.DownloadAndCreateFile(sugar, sm, url, cwd)
 
 	defer os.Remove(f.Name())
 
@@ -64,7 +63,7 @@ func protocInstaller(sm semvar.SemVar, installPath string) error {
 		return fmt.Errorf("error during making protoc directory: %w", err)
 	}
 
-	err = unzip.UnzipToDir(f.Name(), cwd+"protoc")
+	err = unzip.ToDir(sugar, f.Name(), cwd+"protoc")
 	if err != nil {
 		return fmt.Errorf("error during unzipping: %w", err)
 	}

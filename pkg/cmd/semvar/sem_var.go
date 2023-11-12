@@ -19,7 +19,6 @@ func newSemVar(major, minor int) SemVar {
 }
 
 func (s SemVar) String() string {
-	//return "v" + strconv.Itoa(s.major) + "." + strconv.Itoa(s.minor) + "." + strconv.Itoa(s.patch)
 	return strconv.Itoa(s.Major) + "." + strconv.Itoa(s.Minor)
 }
 
