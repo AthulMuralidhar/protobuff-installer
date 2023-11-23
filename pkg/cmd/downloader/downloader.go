@@ -62,5 +62,11 @@ func checkIfValid(sugar *zap.SugaredLogger, sm semvar.SemVar) semvar.SemVar {
 		sugar.Error("returned response is not 200")
 		return sm
 	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+
+	fmt.Println(string(body))
+
 	return sm
 }

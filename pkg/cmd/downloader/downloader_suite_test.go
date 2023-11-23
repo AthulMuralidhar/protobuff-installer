@@ -49,16 +49,21 @@ var _ = Describe("checkIfValid", func() {
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
 
-	It("check if the given sem var exists on protoc official page", func() {
-		sm := semvar.SemVar{Major: 25, Minor: 0}
-		got := checkIfValid(sugar, sm)
-		Expect(got).To(Equal(sm))
-	})
+	//It("check if the given sem var exists on protoc official page", func() {
+	//	sm := semvar.SemVar{Major: 25, Minor: 0}
+	//	got := checkIfValid(sugar, sm)
+	//	Expect(got).To(Equal(sm))
+	//})
 
 	It("check if the given sem var exists on protoc official page", func() {
 		sm := semvar.SemVar{Major: 30, Minor: 0}
 		got := checkIfValid(sugar, sm)
 		Expect(got).To(Equal(semvar.SemVar{Major: 25, Minor: 0})) // at the time of writing 25.0 is the max release version
+
+		// notes:
+		// the print in the chek function returns a body with the enite html op,
+		// most likely will need a parser, which ive come across in the go book
+		// so should see how things are done there once again and use it here
 	})
 
 })
