@@ -2,17 +2,11 @@ package downloader
 
 import (
 	"github.com/AthulMuralidhar/protobuff-installer/pkg/cmd/semvar"
-	"go.uber.org/zap"
-	"testing"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.uber.org/zap"
 )
 
-func TestDownloader(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Downloader Suite")
-}
 
 //var _ = Describe("DownloadAndCreateFile", func() {
 //	logger, _ := zap.NewProduction()
